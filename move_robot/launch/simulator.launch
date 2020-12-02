@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- gazebo -->
+  <include file="$(find ur_gazebo)/launch/ur3.launch"/>
+
+  <!-- moveit -->
+  <include file="$(find ur3_moveit_config)/launch/ur3_moveit_planning_execution.launch">
+    <arg name="sim" default="true" />
+  </include>
+
+  <!-- rviz -->
+  <include file="$(find ur3_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" default="true" />
+  </include>
+
+
+
+</launch>
