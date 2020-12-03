@@ -136,7 +136,7 @@ class MoveGroupPythonInteface(object):
     return all_close(joint_goal, current_joints, 0.01)
 
 
-  def go_to_pose_goal(self, x, y, z, xo, yo, zo, wo):
+  def plan_path_to_goal(self, x, y, z, xo, yo, zo, wo):
     move_group = self.move_group
 
     ## Planning to a Pose Goal
@@ -155,21 +155,27 @@ class MoveGroupPythonInteface(object):
     pose_goal.position.z = z
 
     move_group.set_pose_target(pose_goal)
-
+    plan = move_group.plan()
+    # print "target is set"
     ## Now, we call the planner to compute the plan and execute it.
-    plan = move_group.go(wait=True)
+    # plan = move_group.go(wait=True)
+    # move_group.execute(plan, wait=True)
+ 
+    # print "plan type: ", type(plan)
+
     # Calling `stop()` ensures that there is no residual movement
-    move_group.stop()
+    # move_group.stop()
     # It is always good to clear your targets after planning with poses.
     # Note: there is no equivalent function for clear_joint_value_targets()
-    move_group.clear_pose_targets()
+    # move_group.clear_pose_targets()
 
     # For testing:
     # Note that since this section of code will not be included in the tutorials
     # we use the class variable rather than the copied state variable
-    current_pose = self.move_group.get_current_pose().pose
-    return all_close(pose_goal, current_pose, 0.01)
-
+    # current_pose = self.move_group.get_current_pose().pose
+    #return all_close(pose_goal, current_pose, 0.01)
+    return plan
+ 
 
   def plan_cartesian_path(self, scale=1):
     move_group = self.move_group
@@ -178,8 +184,6 @@ class MoveGroupPythonInteface(object):
     ## 
     ## You can plan a Cartesian path directly by specifying a list of waypoints
     ## for the end-effector to go through. If executing  interactively in a
-    ## Python shell, set scale = 1.0.
-    ##
     waypoints = []
 
     wpose = move_group.get_current_pose().pose
@@ -216,10 +220,6 @@ class MoveGroupPythonInteface(object):
     ## You can ask RViz to visualize a plan (aka trajectory) for you. But the
     ## group.plan() method does this automatically so this is not that useful
     ## here (it just displays the same trajectory again):
-    ##
-    ## A `DisplayTrajectory`_ msg has two primary fields, trajectory_start and trajectory.
-    ## We populate the trajectory_start with our current robot state to copy over
-    ## any AttachedCollisionObjects and add our plan to the trajectory.
     display_trajectory = moveit_msgs.msg.DisplayTrajectory()
     display_trajectory.trajectory_start = robot.get_current_state()
     display_trajectory.trajectory.append(plan)
@@ -238,6 +238,11 @@ class MoveGroupPythonInteface(object):
 
     ## **Note:** The robot's current joint state must be within some tolerance of the
     ## first waypoint in the `RobotTrajectory`_ or ``execute()`` will fail
+
+    move_group.stop()
+    # It is always good to clear your targets after planning with poses.
+    # Note: there is no equivalent function for clear_joint_value_targets()
+    move_group.clear_pose_targets()
 
 
   def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
@@ -427,7 +432,7 @@ class MoveGroupPythonInteface(object):
     rospy.sleep(4)
     self.move_group.execute(plan,wait=True)
 
-  def execute_path(self, array):
+  def create_cartesian_path(self, array):
     current_pose = self.move_group.get_current_pose().pose
     current_position = current_pose.position
     current_orientation = current_pose.orientation
@@ -478,6 +483,7 @@ class MoveGroupPythonInteface(object):
                                    way,   # waypoints to follow
                                    0.01,        # eef_step
                                    0.0, # jump_threshold
-                                   avoid_collisions=True)       
+                                   avoid_collisions=True)    
 
-    self.move_group.execute(plan,wait=True)
+    # self.move_group.execute(plan,wait=True)
+    return plan 

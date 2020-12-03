@@ -64,25 +64,42 @@ def main():
     print "Go to home"
     move_group.go_to_joint_state(0, -50, 80, -30, 90, 0)
 
-    print "============ Press `Enter` to execute a movement using a pose goal ..."
+    print "============ Press `Enter` to plan and execute movements..."
     raw_input()
 
-    move_group.go_to_pose_goal(0.134, 0.328, 0.038, 0, 0, 0, 1)
+    print "*** Plan and execute first point ***"
+    plan1 = move_group.plan_path_to_goal(0.134, 0.328, 0.038, 0, 0, 0, 1)
+    move_group.execute_plan(plan1)
+    print "*** Plan and execute second point ***"
+    plan2 = move_group.plan_path_to_goal(0.3, 0.0, 0.2, 0, 0, 0, 1)
+    move_group.execute_plan(plan2)
 
-    print "============ Press `Enter` to go to home =============="
-    raw_input()
-    move_group.go_to_joint_state(0, -50, 80, -30, 90, 0)
-
-    print "============ Press `Enter` to execute a movement using a pose goal ..."
-    raw_input()
+    #print "============ Press `Enter` to execute a movement using a pose goal ..."
+    #raw_input()
+    print "*** Plan and execute sequence of two other points ***"
     waypoints_array = []
     waypoints_array.append([0.3, 0.26496604472, 0.320554352366, 0, 0, 0, 1, False])
     waypoints_array.append([0.3, -0.26496604472, 0.320554352366, 0, 0, 0, 1, False])
-    move_group.execute_path(waypoints_array)
+    plan3 = move_group.create_cartesian_path(waypoints_array)
+    move_group.execute_plan(plan3)
 
-    print "============ Press `Enter` to go to home =============="
-    raw_input()
+    print "Go to home"
     move_group.go_to_joint_state(0, -50, 80, -30, 90, 0)
+
+    print "============ Press `Enter` to execute all movements again ..."
+    raw_input()
+
+    move_group.go_to_joint_state(0, -50, 80, -30, 90, 0)
+
+    move_group.execute_plan(plan1)
+    move_group.execute_plan(plan2)
+    move_group.execute_plan(plan3)
+
+
+
+    #print "============ Press `Enter` to go to home =============="
+    #raw_input()
+    #move_group.go_to_joint_state(0, -50, 80, -30, 90, 0)
 
 
 
